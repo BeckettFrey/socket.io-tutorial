@@ -1,0 +1,18 @@
+{
+  "name": "chatter-box",
+  "version": "1.0.0",
+  "description": "Simple chat app using socket.io - Communicate in chat rooms up to 15 people.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "node": "^19.3.0",
+    "socket.io": "^4.5.4"
+  }
+}
