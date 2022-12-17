@@ -1,2 +1,2 @@
-# Chatter-Box
- Simple chat app using socket.io - Communicate in chat rooms up to 15 people.
+# socket.io-tutorial
+Learning usage of socket.io with Express Node to demonstarte usage with simplest implementation and front-end.
