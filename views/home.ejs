@@ -5,23 +5,26 @@
     <title>Document</title>
   </head>
   <body>
+    <p>Welcome <%= cred.username %></p>
+
     <input type="text" class="message" />
-    <button onclick="sendMessage()"">send</button>
+    <button onclick="sendMessage()">send</button>
     <h1></h1>
     <script>
-      const socket = io("http://localhost:3001");
+      const socket = io("http://localhost:3000");
       socket.on("connection");
       socket.on("message", (data) => {
+        console.log(data);
         const newEl = document.createElement("p");
-        const tesNode =document.createTextNode(data)
-        newEl.append(tesNode)
+        const tesNode = document.createTextNode(data);
+        newEl.append(tesNode);
         document.querySelector("h1").appendChild(newEl);
       });
 
       const sendMessage = () => {
         const msg = document.querySelector(".message");
-        const message = msg.value
-        socket.emit("message",message);
+        const message = msg.value;
+        socket.emit("message", message);
       };
     </script>
   </body>

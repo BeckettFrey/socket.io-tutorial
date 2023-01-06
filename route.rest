@@ -1,0 +1,19 @@
+GET http://localhost:3000/home/all
+
+
+###
+
+GET http://localhost:3000/home
+Content-Type: application/json
+
+{
+    "username": "Be",
+    "password": "Passy"
+}
+###
+
+DELETE http://localhost:3002/home/63b6158a20ecca2b098eb9a9
+
+###
+
+GET http://localhost:3002/home/63b7417d9df8d722efefab42
