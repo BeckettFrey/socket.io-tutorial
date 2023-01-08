@@ -2,20 +2,27 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 
+var chats = require("./routes/chats");
 const mongoose = require("mongoose");
 app.use(express.json());
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true });
 const db = mongoose.connection;
-
 const server = require("http").createServer(app);
-const io = require("socket.io")(server, { cors: { orgin: "*" } });
+const io = require("socket.io")(server);
 server.listen(3000);
-//logging in.
+var room;
 io.on("connection", (socket) => {
-  console.log("user connected:" + socket.id);
+  console.log("connection");
+  socket.on("joinroom", (data) => {
+    room = data;
+    socket.join(data);
+  });
+  // socket.on("login", ({ name, room }, callback) => {});
+
   socket.on("message", (data) => {
     console.log(data);
-    socket.broadcast.emit("message", data);
+
+    socket.broadcast.to(room).emit("message", data);
   });
 });
 

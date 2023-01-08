@@ -1,16 +1,26 @@
 const express = require("express");
 const router = express.Router();
 const Account = require("../models/account");
+//encryption
+const bcrypt = require("bcrypt");
 // For Json input from form
 const fs = require("fs");
 var bodyParser = require("body-parser");
 const { stringify } = require("querystring");
 router.use(bodyParser.urlencoded({ extended: false }));
 
-router.post("/login", getAccountNoID, (req, res) => {
-  let cred = res.account;
-  cred = cred[0];
-  res.render("home", { cred });
+router.post("/login", async (req, res) => {
+  var hashPass = await Account.find({ username: req.body.username }).exec();
+  try {
+    if (await bcrypt.compare(req.body.password, hashPass[0].password)) {
+      let cred = hashPass[0];
+      res.render("home", { cred });
+    } else {
+      res.send(" - Password is incorrect - ");
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // Getting all acounts in db. (ADMIN)
@@ -22,22 +32,40 @@ router.get("/all", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
+//New chat
+router.post("/:id/new", getAccount, async (req, res) => {
+  console.log(res.account);
+  res.account.hosting.push(req.body.chat);
+  console.log(res.account);
+  var cred = res.account;
+  try {
+    if (await Account.findByIdAndUpdate(req.params.id, res.account)) {
+      res.render("home", { cred });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 //Making account.
 router.post("/signup", async (req, res) => {
   // Check for repetition (1)
   var name = req.body.username;
   const check = await Account.find({ username: name }).exec();
   console.log(check);
-  if (check.length === 0) {
+  if (check == "") {
     // (1)
     // Check for empty entries (2)
     if (req.body.password != null && req.body.username != null) {
       // (2)
-      // Creat model Object (3)
+      // Hash and Create model Object (3)
+      try {
+        var hashedPassword = await bcrypt.hash(req.body.password, 10);
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
       const account = new Account({
         username: req.body.username,
-        password: req.body.password,
+        password: hashedPassword,
       });
       // (3)
       try {
@@ -83,26 +111,6 @@ async function getAccount(req, res, next) {
   // Leave function.
   next();
 }
-
-//Same as above w/ noID.
-async function getAccountNoID(req, res, next) {
-  let account;
-  // Search for account.
-  var name = req.body.username;
-  var pass = req.body.password;
-  console.log(name);
-  console.log("inside");
-  try {
-    account = await Account.find({ username: name, password: pass }).exec();
-    if (account == null) {
-      res.status(404).json("cannot find account " + req.body.id);
-    }
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
-  // Store account if found.
-  res.account = account;
-  // Leave function.
-  next();
-}
+const chatsRouter = require("../routes/chats");
+router.use("/chats", chatsRouter);
 module.exports = router;
